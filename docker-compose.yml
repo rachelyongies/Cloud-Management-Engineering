@@ -131,25 +131,25 @@ services:
   ###############################################
   # Fulfill Order: The Fulfill Order microservice
   ###############################################
-  fulfill_order:
-    build:
-      context: ./
-      dockerfile: fulfill_order.Dockerfile
-    container_name: fulfill_order
-    restart: always
-    depends_on:
-      - "item"
-      - "order"
-      - "user"
-    environment:
-      item_URL: http://item:5001/item/setpendingstatus
-      order_URL: http://order:5002/order/users
-      user_URL: http://user:5003/user/email_list
-      PYTHONUNBUFFERED: 1
-    ports:
-      - "5200:5200"
-    networks:
-      - G6T4-Network
+  # fulfill_order:
+  #   build:
+  #     context: ./
+  #     dockerfile: fulfill_order.Dockerfile
+  #   container_name: fulfill_order
+  #   restart: always
+  #   depends_on:
+  #     - "item"
+  #     - "order"
+  #     - "user"
+  #   environment:
+  #     item_URL: http://item:5001/item/setpendingstatus
+  #     order_URL: http://order:5002/order/users
+  #     user_URL: http://user:5003/user/email_list
+  #     PYTHONUNBUFFERED: 1
+  #   ports:
+  #     - "5200:5200"
+  #   networks:
+  #     - G6T4-Network
   ###############################################
   # Archive item: The Archive Item microservice
   ###############################################
