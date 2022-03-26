@@ -31,9 +31,6 @@ class User_Detail(db.Model):
     addresses = db.relationship(
         'User_Addresses', backref='user_detail'
     )
-    credit_cards = db.relationship(
-        'User_Credit_Card', backref='user_detail'
-    )
 
     def __init__(self, user_type, user_id, user_password, fullname, email, phone_number):
         self.user_type = user_type
@@ -52,47 +49,6 @@ class User_Detail(db.Model):
             "email": self.email,
             "phone_number": self.phone_number
         })
-
-
-class User_Credit_Card(db.Model):
-    __tablename__ = 'user_credit_card'
-
-    user_id = db.Column(db.String(15), db.ForeignKey(
-        'user_detail.user_id'), primary_key=True, nullable=False)
-    card_number = db.Column(db.String(12), primary_key=True)
-    cardholder_name = db.Column(db.String(50))
-    cvv = db.Column(db.Integer)
-    expiry_month = db.Column(db.Integer)
-    expiry_year = db.Column(db.Integer)
-
-    def __init__(self, user_id, card_number, cardholder_name, cvv, expiry_month, expiry_year):
-        self.user_id = user_id
-        self.card_number = card_number
-        self.cardholder_name = cardholder_name
-        self.cvv = cvv
-        self.expiry_month = expiry_month
-        self.expiry_year = expiry_year
-
-    def json(self):
-        return({
-            "user_id": self.user_id,
-            "card_number": self.card_number,
-            "cardholder_name": self.cardholder_name,
-            "cvv": self.cvv,
-            "expiry_month": self.expiry_month,
-            "expiry_year": self.expiry_year
-        })
-
-    def print_json(self):
-        print({
-            "user_id": self.user_id,
-            "card_number": self.card_number,
-            "cardholder_name": self.cardholder_name,
-            "cvv": self.cvv,
-            "expiry_month": self.expiry_month,
-            "expiry_year": self.expiry_year
-        })
-
 
 class User_Addresses(db.Model):
     __tablename__ = 'user_addresses'
@@ -240,28 +196,6 @@ def get_user_addresses(user_id):
         }
     ), 404
 
-
-@app.route("/user/<string:user_id>/credit_cards")
-def get_user_credit_cards(user_id):
-    user_credit_cards = User_Credit_Card.query.filter_by(user_id=user_id)
-    if user_credit_cards is not None:
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "credit_cards": [credit_card.json() for credit_card in user_credit_cards]
-                }
-            }
-        )
-
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no credit cards."
-        }
-    ), 404
-
-
 @app.route("/user/<string:user_id>/addresses/add_address", methods=['POST'])
 def add_user_address(user_id):
     data = request.get_json()
@@ -306,52 +240,6 @@ def add_user_address(user_id):
         {
             "code": 201,
             "message": "Addition of address Successful"
-        }
-    )
-
-
-@app.route("/user/<string:user_id>/credit_cards/add_credit_card", methods=['POST'])
-def add_user_credit_card(user_id):
-    data = request.get_json()
-    card_number = data["card_number"]
-    cardholder_name = data["cardholder_name"]
-    cvv = data["cvv"]
-    expiry_month = data["expiry_month"]
-    expiry_year = data["expiry_year"]
-
-    if(User_Credit_Card.query.filter_by(user_id=user_id, card_number=card_number, cardholder_name=cardholder_name, cvv=cvv, expiry_month=expiry_month, expiry_year=expiry_year).first()):
-        return jsonify(
-            {
-                "code": 400,
-                "message": "Credit card already exists."
-            }
-        ), 400
-
-    new_row = User_Credit_Card(user_id, **data)
-
-    try:
-        db.session.add(new_row)
-        db.session.commit()
-    except:
-        name = 'User Add Credit Card'
-        message = f"Error during addition of credit card for the user {user_id}"
-        user_invoke('Error', name, message)
-
-        return jsonify(
-            {
-                "code": 500,
-                "message": "There was an issue with addition of credit card. Please try again."
-            }
-        )
-
-    name = 'User Add Credit Card'
-    message = f"Successful addition of credit card for the user {user_id}"
-    user_invoke('Log', name, message)
-
-    return jsonify(
-        {
-            "code": 201,
-            "message": "Addition of credit card Successful"
         }
     )
 

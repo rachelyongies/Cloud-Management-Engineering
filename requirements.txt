@@ -5,6 +5,3 @@ Flask-Cors==3.0.10
 requests==2.25.1
 passlib==1.7.4
 stripe==2.56.0
-pika==1.2.0
-graphene==2.1.8
-flask-GraphQL==2.0.1
