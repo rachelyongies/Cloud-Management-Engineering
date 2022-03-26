@@ -91,18 +91,18 @@ services:
   ###################################
   # 7: Notification
   ###################################
-  notification:
-    build:
-      context: ./
-      dockerfile: notification.Dockerfile
-    container_name: notification
-    restart: always
-    environment:
-      PYTHONUNBUFFERED: 1
-    ports:
-      - '5005:5005'
-    networks:
-      - G6T4-Network
+  # notification:
+  #   build:
+  #     context: ./
+  #     dockerfile: notification.Dockerfile
+  #   container_name: notification
+  #   restart: always
+  #   environment:
+  #     PYTHONUNBUFFERED: 1
+  #   ports:
+  #     - '5005:5005'
+  #   networks:
+  #     - G6T4-Network
 
   ###############################################
   # Place Order: The Place Order microservice
@@ -153,25 +153,25 @@ services:
   ###############################################
   # Archive item: The Archive Item microservice
   ###############################################
-  archive_item:
-    build:
-      context: ./
-      dockerfile: archive_item.Dockerfile
-    container_name: archive_item
-    restart: always
-    depends_on:
-      - "item"
-      - "payment"
-    environment:
-      item_URL: http://item:5001/item/setarchivestatus
-      payment_URL: http://payment:5004/payment
-      order_URL: http://order:5002/order/users
-      user_URL: http://user:5003/user/email_list
-      PYTHONUNBUFFERED: 1
-    ports:
-      - "5222:5222"
-    networks:
-      - G6T4-Network
+  # archive_item:
+  #   build:
+  #     context: ./
+  #     dockerfile: archive_item.Dockerfile
+  #   container_name: archive_item
+  #   restart: always
+  #   depends_on:
+  #     - "item"
+  #     - "payment"
+  #   environment:
+  #     item_URL: http://item:5001/item/setarchivestatus
+  #     payment_URL: http://payment:5004/payment
+  #     order_URL: http://order:5002/order/users
+  #     user_URL: http://user:5003/user/email_list
+  #     PYTHONUNBUFFERED: 1
+  #   ports:
+  #     - "5222:5222"
+  #   networks:
+  #     - G6T4-Network
   
 
 networks:
