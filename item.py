@@ -27,22 +27,16 @@ class Item(db.Model):
     item_qty = db.Column(db.Integer, nullable=False)
     item_desc = db.Column(db.String(150), nullable=False)
     item_price = db.Column(db.Float(precision=2), nullable=False)
-    current_count = db.Column(db.Integer, nullable=False)
-    shipping_count = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(15), nullable=False)
-    expiry = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, item_id, category, item_name, item_qty, item_desc, item_price, current_count, shipping_count, status, expiry):
+    def __init__(self, item_id, category, item_name, item_qty, item_desc, item_price, status):
         self.item_id = item_id
         self.category = category
         self.item_name = item_name
         self.item_qty = item_qty
         self.item_desc = item_desc
         self.item_price = item_price
-        self.current_count = current_count
-        self.shipping_count = shipping_count
         self.status = status
-        self.expiry = expiry
 
     def json(self):
         return {
@@ -52,10 +46,7 @@ class Item(db.Model):
             "item_qty": self.item_qty,
             "item_desc": self.item_desc,
             "item_price": self.item_price,
-            "current_count": self.current_count,
-            "shipping_count": self.shipping_count,
             "status": self.status,
-            "expiry": self.expiry
         }
 
 
@@ -134,7 +125,6 @@ def get_all_with_status(status):
 
         item_dict = item.json()
         item_dict['image_url'] = img_url
-        item_dict['expiry'] = item_dict['expiry']
         output.append(item_dict)
 
     if len(output):
@@ -154,8 +144,6 @@ def get_all_with_status(status):
     ), 404
 
 # get specific item with item_id (w all the image URLs)
-
-
 @app.route("/item/<string:item_id>")
 def get_item(item_id):
 
@@ -193,51 +181,7 @@ def get_item(item_id):
         }
     ), 404
 
-
-# increase item count
-@app.route("/item/increase-count", methods=['PUT'])
-def increaseCount():
-    data = request.get_json()
-    item_id = data["item_id"]
-    quantity = data["quantity"]
-
-    try:
-        item_row = Item.query.filter_by(item_id=item_id).first()
-    except:
-        name = 'Item Count Increase'
-        message = f"There was an error increaseing the count for the item with item_id={item_id} (item does not exist)."
-        item_invoke('Error', name, message)
-
-        return jsonify({
-            "code": "404",
-            "message": "Item does not exist"
-        }), 404
-
-    try:
-        item_row.current_count = item_row.current_count + int(quantity)
-        db.session.commit()
-    except:
-        name = 'Item Count Increase'
-        message = f"There was an error increaseing the count for the item with item_id={item_id}."
-        item_invoke('Error', name, message)
-
-        return jsonify({
-            "code": "500",
-            "message": "Error occurred while increasing the current_count of the item."
-        }), 500
-
-    name = 'Item Count Increase'
-    message = f"The item count for item with item_id={item_id}, has just been increased by {quantity}."
-    item_invoke('Log', name, message)
-
-    return jsonify({
-        "code": "200",
-        "message": "OK."
-    }), 200
-
 # set pending status
-
-
 @app.route("/item/setpendingstatus/<string:item_id>", methods=['PUT'])
 def setpendingstatus(item_id):
     row = Item.query.filter_by(item_id=item_id).first()
@@ -248,7 +192,6 @@ def setpendingstatus(item_id):
         except:
             name = 'Item Status Change'
             message = f"Error when changing item status from 'Pending' to 'Shipping', for item with item_id={item_id}."
-            item_invoke('Error', name, message)
 
             return jsonify(
                 {
@@ -259,7 +202,6 @@ def setpendingstatus(item_id):
 
     name = 'Item Status Change'
     message = f"The item status for item with item_id={item_id}, has just been changed from 'Pending' to 'Shipping'."
-    item_invoke('Log', name, message)
 
     return jsonify(
         {
@@ -269,9 +211,7 @@ def setpendingstatus(item_id):
         }
     ), 200
 
-# set shiping status
-
-
+# set shipping status
 @app.route("/item/setshippingstatus/<string:item_id>", methods=['PUT'])
 def setshippingstatus(item_id):
     row = Item.query.filter_by(item_id=item_id).first()
@@ -282,7 +222,6 @@ def setshippingstatus(item_id):
         except:
             name = 'Item Status Change'
             message = f"Error when changing item status from 'Shipping' to 'Complete', for item with item_id={item_id}."
-            item_invoke('Error', name, message)
 
             return jsonify(
                 {
@@ -293,7 +232,6 @@ def setshippingstatus(item_id):
 
     name = 'Item Status Change'
     message = f"The item status for item with item_id={item_id}, has just been changed from 'Shipping' to 'Complete'."
-    item_invoke('Log', name, message)
 
     return jsonify(
         {
@@ -303,8 +241,6 @@ def setshippingstatus(item_id):
     ), 200
 
 # set archive status when item is pending
-
-
 @app.route("/item/setarchivestatus/<string:item_id>", methods=['PUT'])
 def setarchivestatus(item_id):
     row = Item.query.filter_by(item_id=item_id).first()
@@ -324,7 +260,6 @@ def setarchivestatus(item_id):
         except:
             name = 'Item Status Change'
             message = f"Error when changing item status from 'Pending' to 'Archived', for item with item_id={item_id}."
-            item_invoke('Error', name, message)
 
             return jsonify(
                 {
@@ -335,7 +270,6 @@ def setarchivestatus(item_id):
 
         name = 'Item Status Change'
         message = f"The item status for item with item_id={item_id}, has just been changed from 'Pending' to 'Archived'."
-        item_invoke('Log', name, message)
 
         return jsonify(
             {
@@ -347,7 +281,6 @@ def setarchivestatus(item_id):
     else:
         name = 'Item Status Change'
         message = f"Error when archiving item as status is not pending, for item with item_id={item_id}."
-        item_invoke('Error', name, message)
 
         return jsonify(
             {
@@ -383,7 +316,6 @@ def add_item():
     data = request.get_json()
     item_id = ''.join(
         [random.choice(string.ascii_letters + string.digits) for n in range(15)])
-    data["expiry"] = datetime.fromisoformat(data["expiry"])
 
     category = data["category"]
     item_name = data["item_name"]
@@ -391,13 +323,11 @@ def add_item():
     item_desc = data["item_desc"]
     item_price = data["item_price"]
     current_count = 0
-    shipping_count = data["shipping_count"]
     status = 'pending'
-    expiry = data["expiry"]
     image_url = data["image_url"]
 
     item = Item(item_id, category, item_name, item_qty, item_desc,
-                item_price, current_count, shipping_count, status, expiry)
+                item_price, current_count, status)
     item_json = item.json()
 
     try:
@@ -407,7 +337,6 @@ def add_item():
     except:
         name = 'Item Creation'
         message = f"Error when adding item, for item with item_id={item_id}."
-        item_invoke('Error', name, message)
 
         return jsonify(
             {
@@ -425,7 +354,6 @@ def add_item():
         except:
             name = 'Item Creation'
             message = f"Error when adding item_image, for item with item_id={item_id}."
-            item_invoke('Error', name, message)
 
             return jsonify(
                 {
@@ -437,7 +365,6 @@ def add_item():
 
     name = 'Item Creation'
     message = f"The item with item_id={item_id}, has been successfully added into the db."
-    item_invoke('Log', name, message)
 
     return jsonify(
         {
