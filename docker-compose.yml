@@ -74,36 +74,6 @@ services:
     networks:
       - G6T4-Network
 
-  # ###################################
-  # # 6: RabbitMQ
-  # ###################################
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   container_name: rabbitmq
-  #   hostname: rabbit
-  #   restart: always
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"
-  #   volumes: 
-  #     - rabbitmq_data:/var/lib/rabbitmq
-
-  ###################################
-  # 7: Notification
-  ###################################
-  # notification:
-  #   build:
-  #     context: ./
-  #     dockerfile: notification.Dockerfile
-  #   container_name: notification
-  #   restart: always
-  #   environment:
-  #     PYTHONUNBUFFERED: 1
-  #   ports:
-  #     - '5005:5005'
-  #   networks:
-  #     - G6T4-Network
-
   ###############################################
   # Place Order: The Place Order microservice
   ###############################################
@@ -127,52 +97,6 @@ services:
       - "5100:5100"
     networks:
       - G6T4-Network
-
-  ###############################################
-  # Fulfill Order: The Fulfill Order microservice
-  ###############################################
-  # fulfill_order:
-  #   build:
-  #     context: ./
-  #     dockerfile: fulfill_order.Dockerfile
-  #   container_name: fulfill_order
-  #   restart: always
-  #   depends_on:
-  #     - "item"
-  #     - "order"
-  #     - "user"
-  #   environment:
-  #     item_URL: http://item:5001/item/setpendingstatus
-  #     order_URL: http://order:5002/order/users
-  #     user_URL: http://user:5003/user/email_list
-  #     PYTHONUNBUFFERED: 1
-  #   ports:
-  #     - "5200:5200"
-  #   networks:
-  #     - G6T4-Network
-  ###############################################
-  # Archive item: The Archive Item microservice
-  ###############################################
-  # archive_item:
-  #   build:
-  #     context: ./
-  #     dockerfile: archive_item.Dockerfile
-  #   container_name: archive_item
-  #   restart: always
-  #   depends_on:
-  #     - "item"
-  #     - "payment"
-  #   environment:
-  #     item_URL: http://item:5001/item/setarchivestatus
-  #     payment_URL: http://payment:5004/payment
-  #     order_URL: http://order:5002/order/users
-  #     user_URL: http://user:5003/user/email_list
-  #     PYTHONUNBUFFERED: 1
-  #   ports:
-  #     - "5222:5222"
-  #   networks:
-  #     - G6T4-Network
-  
 
 networks:
   G6T4-Network:
