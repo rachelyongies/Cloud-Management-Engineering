@@ -5,43 +5,7 @@ volumes:
 
 services:
 
-  ###################################
-  # GraphQL API Gateway
-  ###################################
-  graphql:
-    build:
-      context: ./
-      dockerfile: graphql.Dockerfile
-    container_name: graphql
-    restart: always
-    environment:
-      PYTHONUNBUFFERED: 1
-      item_URL: http://item:5001/item/
-      order_URL: http://order:5002/order
-      user_URL: http://user:5003/user/
-    ports:
-      - '4000:4000'
-    networks:
-      - G6T4-Network
 
-
-  ###################################
-  # 1: The Activity Log microservice
-  ###################################
-  activity_log:
-    build:
-      context: ./
-      dockerfile: activity_log.Dockerfile
-    container_name: activity_log
-    restart: always
-    environment:
-      dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_activity_logs
-      PYTHONUNBUFFERED: 1
-      rabbit_port: 5672
-    ports:
-      - '5000:5000'
-    networks:
-      - G6T4-Network
 
   ###################################
   # 2: The Item microservice
@@ -52,12 +16,9 @@ services:
       dockerfile: item.Dockerfile
     container_name: item
     restart: always
-    depends_on:
-      - "rabbitmq"
     environment:
       dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_items
       PYTHONUNBUFFERED: 1
-      rabbit_port: 5672
     ports:
       - '5001:5001'
     networks:
@@ -72,12 +33,9 @@ services:
       dockerfile: order.Dockerfile
     container_name: order
     restart: always
-    depends_on:
-      - "rabbitmq"
     environment:
       dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_orders
       PYTHONUNBUFFERED: 1
-      rabbit_port: 5672
     ports:
       - '5002:5002'
     networks:
@@ -92,12 +50,9 @@ services:
       dockerfile: user.Dockerfile
     container_name: user
     restart: always
-    depends_on:
-      - "rabbitmq"
     environment:
       dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_users
       PYTHONUNBUFFERED: 1
-      rabbit_port: 5672
     ports:
       - '5003:5003'
     networks:
@@ -119,19 +74,19 @@ services:
     networks:
       - G6T4-Network
 
-  ###################################
-  # 6: RabbitMQ
-  ###################################
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    hostname: rabbit
-    restart: always
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes: 
-      - rabbitmq_data:/var/lib/rabbitmq
+  # ###################################
+  # # 6: RabbitMQ
+  # ###################################
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   hostname: rabbit
+  #   restart: always
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   volumes: 
+  #     - rabbitmq_data:/var/lib/rabbitmq
 
   ###################################
   # 7: Notification
@@ -142,11 +97,8 @@ services:
       dockerfile: notification.Dockerfile
     container_name: notification
     restart: always
-    depends_on:
-      - "rabbitmq"
     environment:
       PYTHONUNBUFFERED: 1
-      rabbit_port: 5672
     ports:
       - '5005:5005'
     networks:
@@ -162,13 +114,10 @@ services:
     container_name: place_order
     restart: always
     depends_on:
-      - "activity_log"
       - "item"
       - "order"
       - "user"
-      - "rabbitmq"
     environment:
-      rabbit_port: 5672
       order_URL: http://order:5002/order
       item_URL: http://item:5001/item/increase-count 
       payment_URL: http://payment:5004/payment
@@ -189,7 +138,6 @@ services:
     container_name: fulfill_order
     restart: always
     depends_on:
-      - "activity_log"
       - "item"
       - "order"
       - "user"
@@ -197,7 +145,6 @@ services:
       item_URL: http://item:5001/item/setpendingstatus
       order_URL: http://order:5002/order/users
       user_URL: http://user:5003/user/email_list
-      rabbit_port: 5672
       PYTHONUNBUFFERED: 1
     ports:
       - "5200:5200"
@@ -220,7 +167,6 @@ services:
       payment_URL: http://payment:5004/payment
       order_URL: http://order:5002/order/users
       user_URL: http://user:5003/user/email_list
-      rabbit_port: 5672
       PYTHONUNBUFFERED: 1
     ports:
       - "5222:5222"

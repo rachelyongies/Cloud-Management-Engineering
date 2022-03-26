@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
-from amqp_invoke import order_invoke
+# from amqp_invoke import order_invoke
 
 import string 
 import random
@@ -107,7 +107,7 @@ def create_order():
     except:
         name = 'Create Order Error'
         message = f"Error when creating an order, for order with order_id={order_id}."
-        order_invoke('Error', name, message)
+        
 
         return jsonify(
              {
@@ -127,9 +127,9 @@ def create_order():
             db.session.commit()
 
         except:
-            name = 'order_item creation error'
-            message = f"Error when creating the order_item, for order with order_id={order_id}."
-            order_invoke('Error', name, message)
+            # name = 'order_item creation error'
+            # message = f"Error when creating the order_item, for order with order_id={order_id}."
+            # order_invoke('Error', name, message)
 
             return jsonify(
                 {
@@ -142,9 +142,9 @@ def create_order():
                 }
             ),500
 
-    name = 'Order and Order Item creation'
-    message = f"Successfully created Order and Order Item, for order with order_id={order_id}."
-    order_invoke('Log', name, message)        
+    # name = 'Order and Order Item creation'
+    # message = f"Successfully created Order and Order Item, for order with order_id={order_id}."
+    # order_invoke('Log', name, message)        
     return jsonify(
         {
             "code": 201,
