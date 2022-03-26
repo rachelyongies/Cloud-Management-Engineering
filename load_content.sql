@@ -1,19 +1,19 @@
 USE G4TF_items;
 INSERT INTO `item` (`item_id`, `category`, `item_name`, `item_qty`, `item_desc`, `item_price`, `current_count`, `shipping_count`, `status`, `expiry`) VALUES
-('0lc2Cgj5uroiFDq', 'ring', 'Corona 925 Silver Cocktail Ring', 50, 'The simple and classic design of ring embedded with the luminous zircon. This ring oozes the sophisticated style along your finger.', 116, 0, 6, 'pending', '2021-04-18 12:30:13'),
-('18jTLCgAibIuVeS', 'ear ring', 'Frankie earrings', 200, 'Wide hoop earrings. An extra thick layer of 14k gold plated with brass base. Steel posts. Approximately 11mm hoops.', 56, 19, 25, 'pending', '2021-04-20 12:30:13'),
-('27Hamu4hrLw0qPd', 'ear ring', 'Biar Bridal Hoops', 23, 'The ‘Briar’ bridal hoop earrings are a statement bridal earring made with delicate handcrafted clay flowers and sparkling swarovski crystals. Entirely', 89, 0, 13, 'pending', '2021-04-14 00:00:00'),
-('A7mf5FqlCAms3ZW', 'necklace', 'Silver small round medallion necklace', 40, 'Our solid sterling silver small round St Christopher medallion necklace is the perfect gift for a loved one. Excellent for everyday wear, this St Chri', 50.9, 0, 30, 'pending', '2021-04-10 12:30:13'),
-('favTYxRMfsbLokG', 'necklace', 'Gold single pearl necklace', 40, 'This elegant necklace is perfect for a bride on her wedding day and subtle enough to be dressed down for a more every day look.', 60, 0, 30, 'pending', '2021-04-18 12:30:13'),
-('ftaXI7ybGHm1lfu', 'bracelet', 'Eclipse Cuff', 40, 'The longitudinal and cross sections of the metal remain same color of the original bangle, which enable the color that never fade.', 88, 0, 20, 'pending', '2021-04-18 12:30:13'),
-('hnZlIRkRjuT4Gy9', 'ear ring', 'Gambade Clou de Selle earrings', 30, 'Clasp rose gold chain ear ring with 4 diamonds.', 123.9, 0, 50, 'pending', '2021-04-20 12:30:13'),
-('jqJ6oK3PLMT8HKv', 'ear ring', 'Anouk earrings', 200, 'Petite hoop charm earrings. Cubic zirconia, an extra thick layer of 14k gold plated with brass base. Approximately 15mm hoop.', 46, 19, 25, 'pending', '2021-04-20 12:30:13'),
-('kc5mX0fOK2BXnls', 'ring', 'Contorto 925 Silver Ring', 140, 'The simple and classic design of ring embedded with the luminous zircon. This ring oozes the sophisticated style along your finger.', 133, 0, 20, 'pending', '2021-04-18 12:30:13'),
-('NvKwnrAQx9kmrbA', 'ear ring', 'Gambade Clou de Selle earrings', 30, 'Clasp rose gold chain ear ring with 4 diamonds.', 123.9, 0, 50, 'shipping', '2021-04-20 12:30:13'),
-('oriEhzOHm9TarSF', 'necklace', 'Le Infinità Open Heart 925 Silver Necklace', 50, 'The heart-shaped pendant with sparkling zircon sways with your movement. This design exudes natural elegance.', 70, 0, 6, 'pending', '2021-04-18 12:30:13'),
-('v9OETwCSLkm5g8M', 'ear ring', 'Dani earrings', 233, 'Butterfly wing pair of earrings. Gold plated with brass base and surgical steel posts or sterling silver.', 37, 19, 50, 'pending', '2021-04-20 12:30:13'),
-('wUK2TBomHIccsct', 'necklace', 'Silver personalised bar necklace', 90, 'This stunning, vertically engraved bar necklace in solid sterling silver, is hand crafted in London and can be laser engraved to add a special date, n', 33.9, 0, 30, 'pending', '2021-04-19 12:30:13'),
-('YKryVjV9rhYlLqW', 'ear ring', 'Finesse earrings', 200, 'Earrings in rose gold set with diamonds. An Hermès icon, the signature toggle clasp becomes a motif. A style both graphic and pure.', 36, 19, 25, 'archived', '2021-04-20 12:30:13');
+('0lc2Cgj5uroiFDq', 'ring', 'Corona 925 Silver Cocktail Ring', 50, 'The simple and classic design of ring embedded with the luminous zircon. This ring oozes the sophisticated style along your finger.', 116, 'pending'),
+('18jTLCgAibIuVeS', 'ear ring', 'Frankie earrings', 200, 'Wide hoop earrings. An extra thick layer of 14k gold plated with brass base. Steel posts. Approximately 11mm hoops.', 56, 'pending'),
+('27Hamu4hrLw0qPd', 'ear ring', 'Biar Bridal Hoops', 23, 'The ‘Briar’ bridal hoop earrings are a statement bridal earring made with delicate handcrafted clay flowers and sparkling swarovski crystals. Entirely', 89, 'pending'),
+('A7mf5FqlCAms3ZW', 'necklace', 'Silver small round medallion necklace', 40, 'Our solid sterling silver small round St Christopher medallion necklace is the perfect gift for a loved one. Excellent for everyday wear, this St Chri', 50.9, 'pending'),
+('favTYxRMfsbLokG', 'necklace', 'Gold single pearl necklace', 40, 'This elegant necklace is perfect for a bride on her wedding day and subtle enough to be dressed down for a more every day look.', 60, 'pending'),
+('ftaXI7ybGHm1lfu', 'bracelet', 'Eclipse Cuff', 40, 'The longitudinal and cross sections of the metal remain same color of the original bangle, which enable the color that never fade.', 88, 'pending'),
+('hnZlIRkRjuT4Gy9', 'ear ring', 'Gambade Clou de Selle earrings', 30, 'Clasp rose gold chain ear ring with 4 diamonds.', 123.9, 'pending'),
+('jqJ6oK3PLMT8HKv', 'ear ring', 'Anouk earrings', 200, 'Petite hoop charm earrings. Cubic zirconia, an extra thick layer of 14k gold plated with brass base. Approximately 15mm hoop.', 46, 'pending'),
+('kc5mX0fOK2BXnls', 'ring', 'Contorto 925 Silver Ring', 140, 'The simple and classic design of ring embedded with the luminous zircon. This ring oozes the sophisticated style along your finger.', 133, 'pending'),
+('NvKwnrAQx9kmrbA', 'ear ring', 'Gambade Clou de Selle earrings', 30, 'Clasp rose gold chain ear ring with 4 diamonds.', 123.9, 'shipping'),
+('oriEhzOHm9TarSF', 'necklace', 'Le Infinità Open Heart 925 Silver Necklace', 50, 'The heart-shaped pendant with sparkling zircon sways with your movement. This design exudes natural elegance.', 70, 'pending'),
+('v9OETwCSLkm5g8M', 'ear ring', 'Dani earrings', 233, 'Butterfly wing pair of earrings. Gold plated with brass base and surgical steel posts or sterling silver.', 37, 'pending'),
+('wUK2TBomHIccsct', 'necklace', 'Silver personalised bar necklace', 90, 'This stunning, vertically engraved bar necklace in solid sterling silver, is hand crafted in London and can be laser engraved to add a special date, n', 33.9, 'pending'),
+('YKryVjV9rhYlLqW', 'ear ring', 'Finesse earrings', 200, 'Earrings in rose gold set with diamonds. An Hermès icon, the signature toggle clasp becomes a motif. A style both graphic and pure.', 36, 'archived');
 COMMIT;
 
 INSERT INTO `item_image` (`item_id`, `image_url`) VALUES

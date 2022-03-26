@@ -84,7 +84,6 @@ def get_all():
 
         item_dict = item.json()
         item_dict['image_url'] = img_url
-        item_dict['expiry'] = item_dict['expiry']
         output.append(item_dict)
 
     if len(output):
@@ -161,7 +160,6 @@ def get_item(item_id):
         img_list.append(img.image_url)
 
     itemDetails['images'] = img_list
-    itemDetails['expiry'] = itemDetails['expiry']
 
     if len(itemDetails):
         return jsonify(
@@ -321,12 +319,11 @@ def add_item():
     item_qty = data["item_qty"]
     item_desc = data["item_desc"]
     item_price = data["item_price"]
-    current_count = 0
     status = 'pending'
     image_url = data["image_url"]
 
     item = Item(item_id, category, item_name, item_qty, item_desc,
-                item_price, current_count, status)
+                item_price, status)
     item_json = item.json()
 
     try:
