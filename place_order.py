@@ -4,7 +4,6 @@ from flask_cors import CORS
 import os
 
 import requests
-from amqp_invoke import notification_invoke
 
 
 app = Flask(__name__)
@@ -88,21 +87,21 @@ def place_order():
 
     order_id = response.json()['order_id']
 
-    # 4. send notification
-    method = 'GET'
-    url = user_URL + f'/{data["user_id"]}'
-    response = requests.request(method, url)
+    # # 4. send notification
+    # method = 'GET'
+    # url = user_URL + f'/{data["user_id"]}'
+    # response = requests.request(method, url)
 
-    email_type = 'place_order'
-    fullname = response.json()['details']['fullname']
-    email = response.json()['details']['email']
-    message_details = {
-        "payment_amount": payment_amount,
-        "order_id": order_id,
-        "item_list": item_list
-    }
+    # email_type = 'place_order'
+    # fullname = response.json()['details']['fullname']
+    # email = response.json()['details']['email']
+    # message_details = {
+    #     "payment_amount": payment_amount,
+    #     "order_id": order_id,
+    #     "item_list": item_list
+    # }
 
-    notification_invoke(email_type=email_type, fullname=fullname, email_list=[email], message_details=message_details)
+    # notification_invoke(email_type=email_type, fullname=fullname, email_list=[email], message_details=message_details)
 
     # If everything is oll korreck (ok)
     return jsonify({
