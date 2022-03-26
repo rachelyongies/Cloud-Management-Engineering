@@ -1,7 +1,6 @@
 import random
 import string
 
-from amqp_invoke import user_invoke
 from os import environ
 from passlib.hash import sha256_crypt
 from flask import Flask, request, jsonify
@@ -122,7 +121,6 @@ def signup(user_type):
     except:
         name = 'User Signup'
         message = f"Error when creating the {user_type} user with email={data['email']}"
-        user_invoke('Error', name, message)
 
         return jsonify(
             {
@@ -133,7 +131,6 @@ def signup(user_type):
 
     name = 'User Signup'
     message = f"Successful creation of the {user_type} user with email={data['email']} and user_id={user_id}"
-    user_invoke('Log', name, message)
 
     return jsonify(
         {
@@ -223,7 +220,6 @@ def add_user_address(user_id):
     except:
         name = 'User Add Address'
         message = f"Error during addition of address for the user {user_id}"
-        user_invoke('Error', name, message)
 
         return jsonify(
             {
@@ -234,7 +230,6 @@ def add_user_address(user_id):
 
     name = 'User Add Address'
     message = f"Successful addition of credit card for the user {user_id}"
-    user_invoke('Log', name, message)
 
     return jsonify(
         {
