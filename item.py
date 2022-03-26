@@ -1,7 +1,6 @@
 import string
 import random
 
-from amqp_invoke import item_invoke
 from datetime import datetime
 from os import environ
 from flask import Flask, request, jsonify
