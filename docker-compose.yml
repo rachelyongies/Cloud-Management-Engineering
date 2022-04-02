@@ -10,7 +10,7 @@ services:
   ###################################
   cart:
     build:
-      context: ./
+      context: /Microservices/Cart
       dockerfile: cart.Dockerfile
     container_name: cart
     restart: always
@@ -27,7 +27,7 @@ services:
   ###################################
   item:
     build:
-      context: ./
+      context: /Microservices/Item
       dockerfile: item.Dockerfile
     container_name: item
     restart: always
@@ -44,7 +44,7 @@ services:
   ###################################
   order:
     build:
-      context: ./
+      context: /Microservices/Order
       dockerfile: order.Dockerfile
     container_name: order
     restart: always
@@ -61,7 +61,7 @@ services:
   ###################################
   user:
     build:
-      context: ./
+      context: /Microservices/User
       dockerfile: user.Dockerfile
     container_name: user
     restart: always
@@ -78,7 +78,7 @@ services:
   ###################################
   payment:
     build:
-      context: ./
+      context: /Microservices/Payment
       dockerfile: payment.Dockerfile
     container_name: payment
     restart: always
@@ -94,7 +94,7 @@ services:
   ###############################################
   place_order:
     build:
-      context: ./
+      context: /Microservices/Place_Order
       dockerfile: place_order.Dockerfile
     container_name: place_order
     restart: always
@@ -106,7 +106,6 @@ services:
       order_URL: http://order:5002/order
       item_URL: http://item:5001/item/increase-count 
       payment_URL: http://payment:5004/payment
-      user_URL: http://user:5003/user/details
       PYTHONUNBUFFERED: 1
     ports:
       - "5600:5600"
@@ -115,4 +114,4 @@ services:
 
 networks:
   CMEnetwork:
-    driver: 
+    driver: bridge
