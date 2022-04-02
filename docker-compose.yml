@@ -5,10 +5,25 @@ volumes:
 
 services:
 
-
+  ###################################
+  # 1 : The Cart microservice
+  ###################################
+  cart:
+    build:
+      context: ./
+      dockerfile: cart.Dockerfile
+    container_name: cart
+    restart: always
+    environment:
+      dbURL:
+      PYTHONUNBUFFERED: 1
+    ports:
+      - '5100:5100'
+    networks:
+      - CMEnetwork
 
   ###################################
-  # 2: The Item microservice
+  # 2 : The Item microservice
   ###################################
   item:
     build:
@@ -17,12 +32,12 @@ services:
     container_name: item
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_items
+      dbURL: 
       PYTHONUNBUFFERED: 1
     ports:
-      - '5001:5001'
+      - '5200:5200'
     networks:
-      - G6T4-Network
+      - CMEnetwork
 
   ###################################
   # 3: The Order microservice
@@ -34,12 +49,12 @@ services:
     container_name: order
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_orders
+      dbURL: 
       PYTHONUNBUFFERED: 1
     ports:
-      - '5002:5002'
+      - '5300:5300'
     networks:
-      - G6T4-Network
+      - CMEnetwork
 
   ###################################
   # 4: The User microservice
@@ -51,12 +66,12 @@ services:
     container_name: user
     restart: always
     environment:
-      dbURL: mysql+mysqlconnector://G4TFUser@host.docker.internal:3306/G4TF_users
+      dbURL: 
       PYTHONUNBUFFERED: 1
     ports:
-      - '5003:5003'
+      - '5400:5400'
     networks:
-      - G6T4-Network
+      - CMEnetwork
 
   ###################################
   # 5: The Payment service
@@ -70,12 +85,12 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
     ports:
-      - '5004:5004'
+      - '5500:5500'
     networks:
-      - G6T4-Network
+      - CMEnetwork
 
   ###############################################
-  # Place Order: The Place Order microservice
+  # 6: The Place Order microservice
   ###############################################
   place_order:
     build:
@@ -94,10 +109,10 @@ services:
       user_URL: http://user:5003/user/details
       PYTHONUNBUFFERED: 1
     ports:
-      - "5100:5100"
+      - "5600:5600"
     networks:
-      - G6T4-Network
+      - CMEnetwork
 
 networks:
-  G6T4-Network:
-    driver: bridge
+  CMEnetwork:
+    driver: 
