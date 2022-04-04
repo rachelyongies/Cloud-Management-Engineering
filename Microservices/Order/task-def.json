@@ -5,8 +5,8 @@
     ], 
     "containerDefinitions": [
         {
-            "name": "", 
-            "image": "",
+            "name": "order_service", 
+            "image": "890884262665.dkr.ecr.ap-southeast-1.amazonaws.com/order_service",
             "memory": 500,
             "portMappings": [
                 {
