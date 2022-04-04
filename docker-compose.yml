@@ -103,9 +103,9 @@ services:
       - "order"
       - "user"
     environment:
-      order_URL: http://order:5002/order
-      item_URL: http://item:5001/item/increase-count 
-      payment_URL: http://payment:5004/payment
+      order_URL: http://order:5300/order
+      item_URL: http://item:5200/item/increase-count 
+      payment_URL: http://payment:5500/payment
       PYTHONUNBUFFERED: 1
     ports:
       - "5600:5600"

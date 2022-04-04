@@ -1,0 +1,416 @@
+# This workflow will build and push a new container image to Amazon ECR,
+# and then will deploy a new task definition to Amazon ECS, when there is a push to the main branch.
+#
+# To use this workflow, you will need to complete the following set-up steps:
+#
+# 1. Create an ECR repository to store your images.
+#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
+#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
+#    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
+#
+# 2. Create an ECS task definition, an ECS cluster, and an ECS service.
+#    For example, follow the Getting Started guide on the ECS console:
+#      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
+#    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
+#    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
+#
+# 3. Store your ECS task definition as a JSON file in your repository.
+#    The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
+#    Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
+#    Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container
+#    in the `containerDefinitions` section of the task definition.
+#
+# 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+#    See the documentation for each action used below for the recommended IAM policies for this IAM user,
+#    and best practices on handling the access key credentials.
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECS_CLUSTER: ##
+
+  #Define OrderService Environment Variables
+  ORDER_ECR_REPOSITORY: orderservice
+  ORDER_ECS_SERVICE: OrderService
+  ORDER_ECS_TASK_DEFINITION: Microservices/Order/task-def.json
+  ORDER_CONTAINER_NAME: OrderService
+  ORDER_DOCKERFILE_PATH: ./Microservices/Order/
+
+  # Define PlaceOrderService Environment Variables
+  PLACE_ORDER_ECR_REPOSITORY: placeorderservice
+  PLACE_ORDER_ECS_SERVICE: PlaceOrderservice
+  PLACE_ORDER_ECS_TASK_DEFINITION: Microservices/PlaceOrder/task-def.json
+  PLACE_ORDER_CONTAINER_NAME: PlaceOrderService
+  PLACE_ORDER_DOCKERFILE_PATH: ./Microservices/PlaceOrder/
+
+  # Define ItemService Environment Variables
+  ITEM_ECR_REPOSITORY: itemservice
+  ITEM_ECS_SERVICE: ItemService
+  ITEM_ECS_TASK_DEFINITION: Microservices/Item/task-def.json
+  ITEM_CONTAINER_NAME: ItemService
+  ITEM_DOCKERFILE_PATH: ./Microservices/Item/
+
+  # Define CartService Environment Variables
+  CART_ECR_REPOSITORY: Cartservice
+  CART_ECS_SERVICE: CartService
+  CART_ECS_TASK_DEFINITION: Microservices/Cart/task-def.json
+  CART_CONTAINER_NAME: CartService
+  CART_DOCKERFILE_PATH: ./Microservices/Cart/
+
+  # Define UserService Environment Variables
+  USER_ECR_REPOSITORY: userservice
+  USER_ECS_SERVICE: UserService
+  USER_ECS_TASK_DEFINITION: Microservices/User/task-def.json
+  USER_CONTAINER_NAME: UserService
+  USER_DOCKERFILE_PATH: ./Microservices/User/
+
+  # Define PaymentService Environment Variables
+  PAYMENT_ECR_REPOSITORY: paymentservice
+  PAYMENT_ECS_SERVICE: Paymentservice
+  PAYMENT_ECS_TASK_DEFINITION: Microservices/Payment/task-def.json
+  PAYMENT_CONTAINER_NAME: PaymentService
+  PAYMENT_DOCKERFILE_PATH: ./Microservices/Payment/
+
+jobs:
+  deploy-item:
+    name: Deploy Item
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Inject environment variable for Task Definition
+    - name: Update Task Definitions
+      run : |
+          sed -i "s|<db_url>|$DB_URL|g" Microservices/Item/task-def.json
+      env:
+        DB_URL: ${{secrets.DB_URL}}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ITEM_ECR_REPOSITORY:$IMAGE_TAG $ITEM_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$ITEM_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ITEM_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ITEM_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.ITEM_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ITEM_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+  deploy-place-order:
+    name: Deploy Place Order
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Inject environment variable for Task Definitions
+    - name: Update Task Definitions
+      run: |
+        sed -i "s|<order_url>|$ORDER_URL|g" Microservices/Place_Order/task-def.json
+        sed -i "s|<item_url>|$ITEM_URL|g" Microservices/Place_Order/task-def.json
+        sed -i "s|<payment_url>|$PAYMENT_URL|g" Microservices/Place_Order/task-def.json
+      env:
+        ORDER_URL: ${{secrets.ORDER_URL}}
+        ITEM_URL: ${{secrets.ITEM_URL}}
+        PAYMENT_URL: ${{secrets.PAYMENT_URL}}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$PLACE_ORDER_ECR_REPOSITORY:$IMAGE_TAG $PLACE_ORDER_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$PLACE_ORDER_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$PLACE_ORDER_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.PLACE_ORDER_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.PLACE_ORDER_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.PLACE_ORDER_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+  deploy-user:
+    name: Deploy User
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$USER_ECR_REPOSITORY:$IMAGE_TAG $USER_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$USER_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$USER_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.USER_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.USER_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.USER_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+  deploy-order:
+    name: Deploy Order
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Inject environment variable for Task Definitions
+    - name: Update Task Definitions
+      run: |
+        sed -i "s|<redis_url>|$REDIS_URL|g" Microservices/Order/task-def.json
+        sed -i "s|<mock_supplier_url>|$MOCK_SUPPLIER_URL|g" Microservices/Order/task-def.json
+      env:
+        REDIS_URL: ${{secrets.REDIS_URL}}
+        MOCK_SUPPLIER_URL: ${{secrets.MOCK_SUPPLIER_URL}}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ORDER_ECR_REPOSITORY:$IMAGE_TAG $ORDER_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$ORDER_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ORDER_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ORDER_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.ORDER_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ORDER_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+  deploy-cart:
+    name: Deploy Cart
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Inject environment variable for Task Definitions
+    - name: Update Task Definitions
+      run: |
+        sed -i "s|<item_url>|$ITEM_URL|g" Microservices/Cart/task-def.json
+        sed -i "s|<user_url>|$USER_URL|g" Microservices/Cart/task-def.json
+      env:
+        ITEM_URL: ${{secrets.ITEM_URL}}
+        USER_URL: ${{secrets.USER_URL}}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$CART_ECR_REPOSITORY:$IMAGE_TAG $CART_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$CART_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$CART_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.CART_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CART_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.CART_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    deploy-payment:
+    name: Deploy Payment
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Inject environment variable for Task Definitions
+    - name: Update Task Definitions
+      run: |
+        sed -i "s|<item_url>|$ITEM_URL|g" Microservices/Payment/task-def.json
+        sed -i "s|<user_url>|$USER_URL|g" Microservices/Payment/task-def.json
+      env:
+        PAYMENT_URL: ${{secrets.PAYMENT_URL}}
+        USER_URL: ${{secrets.USER_URL}}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$PAYMENT_ECR_REPOSITORY:$IMAGE_TAG $PAYMENT_DOCKERFILE_PATH
+        docker push $ECR_REGISTRY/$PAYMENT_ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$PAYMENT_ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.PAYMENT_ECS_TASK_DEFINITION }}
+        container-name: ${{ env.PAYMENT_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.PAYMENT_ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
