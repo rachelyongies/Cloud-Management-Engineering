@@ -5,8 +5,8 @@
     ], 
     "containerDefinitions": [
         {
-            "name": "", 
-            "image": "",
+            "name": "item_service", 
+            "image": "890884262665.dkr.ecr.ap-southeast-1.amazonaws.com/item_service",
             "memory": 500,
             "portMappings": [
                 {
