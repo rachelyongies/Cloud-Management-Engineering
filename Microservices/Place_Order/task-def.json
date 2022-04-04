@@ -1,0 +1,22 @@
+{
+    "family": "PlaceOrderTask", 
+    "requiresCompatibilities": [
+        "EC2"
+    ], 
+    "containerDefinitions": [
+        {
+            "name": "", 
+            "image": "",
+            "memory": 500,
+            "portMappings": [
+                {
+                    "containerPort": 5600, 
+                    "protocol": "tcp"
+                }
+            ], 
+            "environment":[
+                {"name": "dbURL", "value": "<db_url>"}
+            ]
+        }
+    ]
+}

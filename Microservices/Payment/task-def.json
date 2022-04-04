@@ -1,0 +1,22 @@
+{
+    "family": "PaymentTask", 
+    "requiresCompatibilities": [
+        "EC2"
+    ], 
+    "containerDefinitions": [
+        {
+            "name": "", 
+            "image": "",
+            "memory": 500,
+            "portMappings": [
+                {
+                    "containerPort": 5500, 
+                    "protocol": "tcp"
+                }
+            ], 
+            "environment":[
+                {"name": "dbURL", "value": "<db_url>"}
+            ]
+        }
+    ]
+}
