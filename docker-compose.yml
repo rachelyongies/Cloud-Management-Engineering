@@ -10,12 +10,12 @@ services:
   ###################################
   cart:
     build:
-      context: /Microservices/Cart
+      context: Microservices/Cart
       dockerfile: cart.Dockerfile
     container_name: cart
     restart: always
     environment:
-      dbURL:
+      dbURL: mysql+pymysql://admin:adminhehe@cart-rds.cxqk8k4y3qza.ap-southeast-1.rds.amazonaws.com
       PYTHONUNBUFFERED: 1
     ports:
       - '5100:5100'
@@ -27,12 +27,12 @@ services:
   ###################################
   item:
     build:
-      context: /Microservices/Item
+      context: Microservices/Item
       dockerfile: item.Dockerfile
     container_name: item
     restart: always
     environment:
-      dbURL: 
+      dbURL: mysql+pymysql://admin:adminhehe@item-rds.cxqk8k4y3qza.ap-southeast-1.rds.amazonaws.com
       PYTHONUNBUFFERED: 1
     ports:
       - '5200:5200'
@@ -44,12 +44,12 @@ services:
   ###################################
   order:
     build:
-      context: /Microservices/Order
+      context: Microservices/Order
       dockerfile: order.Dockerfile
     container_name: order
     restart: always
     environment:
-      dbURL: 
+      dbURL: mysql+pymysql://admin:adminhehe@order-rds.cxqk8k4y3qza.ap-southeast-1.rds.amazonaws.com
       PYTHONUNBUFFERED: 1
     ports:
       - '5300:5300'
@@ -61,12 +61,12 @@ services:
   ###################################
   user:
     build:
-      context: /Microservices/User
+      context: Microservices/User
       dockerfile: user.Dockerfile
     container_name: user
     restart: always
     environment:
-      dbURL: 
+      dbURL: mysql+pymysql://admin:adminhehe@user-rds.cxqk8k4y3qza.ap-southeast-1.rds.amazonaws.com
       PYTHONUNBUFFERED: 1
     ports:
       - '5400:5400'
@@ -78,7 +78,7 @@ services:
   ###################################
   payment:
     build:
-      context: /Microservices/Payment
+      context: Microservices/Payment
       dockerfile: payment.Dockerfile
     container_name: payment
     restart: always
@@ -94,7 +94,7 @@ services:
   ###############################################
   place_order:
     build:
-      context: /Microservices/Place_Order
+      context: Microservices/Place_Order
       dockerfile: place_order.Dockerfile
     container_name: place_order
     restart: always
