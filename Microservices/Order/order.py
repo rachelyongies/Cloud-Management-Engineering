@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
 # from amqp_invoke import order_invoke
+import pymysql
 
 import string 
 import random

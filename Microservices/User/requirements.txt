@@ -1,7 +1,8 @@
-Flask==1.1.2
+Flask==2.0.1
 Flask-SQLAlchemy==2.5.1
 mysql-connector-python==8.0.22
 Flask-Cors==3.0.10
 requests==2.25.1
 passlib==1.7.4
 stripe==2.56.0
+pymysql==1.0.2

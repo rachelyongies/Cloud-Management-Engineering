@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 
 import requests
-
+import pymysql
 
 app = Flask(__name__)
 CORS(app)
